@@ -3,6 +3,12 @@
 dump and load data to cloudflare as persisent storage 
 
 
+https://github.com/huhuhang/jsonbase
+
+
+https://github.com/wanghaisheng/Cloudflare-RESTful-D1
+
+
 
 Sychronized, streaming Python dictionary that uses shared memory as a backend
 
