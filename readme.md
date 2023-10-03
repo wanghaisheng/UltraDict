@@ -1,5 +1,9 @@
 # UltraDict
 
+dump and load data to cloudflare as persisent storage 
+
+
+
 Sychronized, streaming Python dictionary that uses shared memory as a backend
 
 **Warning: This is an early hack. There are only few unit tests and so on. Maybe not stable!**
