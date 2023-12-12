@@ -8,16 +8,16 @@
 import sys
 sys.path.insert(0, '..')
 
-from UltraDict import UltraDict
+from jsondb_in_memory import jsondb_in_memory
 
 import multiprocessing
 
 count = 100000
 
 def run(d, target, x):
-    for i in range(target): 
+    for i in range(target):
         # Adding 1 to the counter is unfortunately not an atomic operation in Python,
-        # but UltraDict's shared lock comes to our resuce: We can simply reuse it.
+        # but jsondb_in_memory's shared lock comes to our resuce: We can simply reuse it.
         with d.lock:
             # Under the lock, we can safely read, modify and
             # write back any values in the shared dict
@@ -26,7 +26,7 @@ def run(d, target, x):
 
 if __name__ == '__main__':
 
-    ultra = UltraDict(buffer_size=10_000)
+    ultra = jsondb_in_memory(buffer_size=10_000)
     ultra['some-key'] = 'some value'
     ultra['counter'] = 0
 

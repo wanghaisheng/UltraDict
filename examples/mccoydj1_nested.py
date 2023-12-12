@@ -9,14 +9,14 @@ import time
 import subprocess
 import sys
 
-from UltraDict import UltraDict
+from jsondb_in_memory import jsondb_in_memory
 
 name='ultra6'
 
 def P1():
 
     print("START P1", file=sys.stderr)
-    ultra = UltraDict(name=name)
+    ultra = jsondb_in_memory(name=name)
 
     while True:
         ultra['banned'][f"{random.randint(1, 254)}.{random.randint(1, 254)}.{random.randint(1, 254)}.{random.randint(1, 254)}"] = True
@@ -29,7 +29,7 @@ def P1():
 def P2():
 
     print("START P2", file=sys.stderr)
-    ultra = UltraDict(name=name)
+    ultra = jsondb_in_memory(name=name)
 
     while True:
         chars = "".join([random.choice(string.ascii_lowercase) for i in range(8)])
@@ -40,12 +40,12 @@ if __name__ == '__main__':
 
     print("START MA", file=sys.stderr)
 
-    # Make sure the UltraDict with name='ultra6' does not exist,
+    # Make sure the jsondb_in_memory with name='ultra6' does not exist,
     # it could be left over from a previous crash
 
-    UltraDict.unlink_by_name(name, ignore_errors=True)
+    jsondb_in_memory.unlink_by_name(name, ignore_errors=True)
 
-    ultra = UltraDict({'banned': { '127.0.0.1': True }}, name=name, buffer_size=10_000, shared_lock=True, recurse=True)
+    ultra = jsondb_in_memory({'banned': { '127.0.0.1': True }}, name=name, buffer_size=10_000, shared_lock=True, recurse=True)
 
     p1 = multiprocessing.Process(target=P1)
     p1.start()

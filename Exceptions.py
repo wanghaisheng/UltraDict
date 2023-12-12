@@ -1,9 +1,9 @@
 #
-# UltraDict
+# jsondb_in_memory
 #
 # A sychronized, streaming Python dictionary that uses shared memory as a backend
 #
-# Copyright [2022] [Ronny Rentner] [ultradict.code@ronny-rentner.de]
+# Copyright [2022] [Ronny Rentner] [jsondb_in_memory.code@ronny-rentner.de]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

@@ -5,13 +5,13 @@
 import sys
 sys.path.insert(0, '..')
 
-from UltraDict import UltraDict
+from jsondb_in_memory import jsondb_in_memory
 
 class MyClass():
     link_name = 'shared-class'
 
     def __init__(self):
-        object.__setattr__(self, '__dict__', UltraDict(name=self.link_name))
+        object.__setattr__(self, '__dict__', jsondb_in_memory(name=self.link_name))
 
     @property
     def x(self):

@@ -8,7 +8,7 @@
 import sys, os
 sys.path.insert(0, '..')
 
-from UltraDict import UltraDict
+from jsondb_in_memory import jsondb_in_memory
 
 import multiprocessing, time, signal, subprocess
 
@@ -48,7 +48,7 @@ def possibly_simulate_crash(d):
         print("Killed. (This message should never print!)")
 
 def run(name, target):
-    d = UltraDict(name=name)
+    d = jsondb_in_memory(name=name)
     process = multiprocessing.process.current_process()
     print(f"Started process name={process.name}, pid={process.pid} {d.lock}")
 
@@ -65,7 +65,7 @@ def run(name, target):
         print("start count: ", d['counter'], ' | ', process.name, process.pid)
         try:
             # Adding 1 to the counter is unfortunately not an atomic operation in Python,
-            # but UltraDict's shared lock comes to our resuce: We can simply reuse it.
+            # but jsondb_in_memory's shared lock comes to our resuce: We can simply reuse it.
             with d.lock(block=False):
                 if d['counter'] < target:
                     # Under the lock, we can safely read, modify and
@@ -118,7 +118,7 @@ def run(name, target):
 
 if __name__ == '__main__':
 
-    ultra = UltraDict(buffer_size=10_000, shared_lock=True)
+    ultra = jsondb_in_memory(buffer_size=10_000, shared_lock=True)
     ultra['counter'] = 0
 
     processes = []
