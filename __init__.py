@@ -1,5 +1,5 @@
 #
-# UltraDict
+# i18n_json
 #
 # A sychronized, streaming Python dictionary that uses shared memory as a backend
 #
@@ -18,4 +18,4 @@
 # limitations under the License.
 #
 
-from .UltraDict import UltraDict
+from .i18n_json import i18n_json

@@ -1,9 +1,9 @@
 #
-# UltraDict
+# i18n_json
 #
 # A sychronized, streaming Python dictionary that uses shared memory as a backend
 #
-# Copyright [2022] [Ronny Rentner] [ultradict.code@ronny-rentner.de]
+# Copyright [2022] [Ronny Rentner] [i18n_json.code@ronny-rentner.de]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-__all__ = ['UltraDict']
+__all__ = ['i18n_json']
 
 import multiprocessing, multiprocessing.shared_memory, multiprocessing.synchronize
 import collections, os, pickle, sys, time, weakref
@@ -70,7 +70,7 @@ def remove_shm_from_resource_tracker():
 #More details at: https://bugs.python.org/issue38119
 remove_shm_from_resource_tracker()
 
-class UltraDict(collections.UserDict, dict):
+class i18n_json(collections.UserDict, dict):
 
     Exceptions = Exceptions
     log = log
@@ -459,23 +459,23 @@ class UltraDict(collections.UserDict, dict):
 
         self.shared_lock = shared_lock
 
-        # Parameters that could be read from remote if we are connecting to an existing UltraDict
+        # Parameters that could be read from remote if we are connecting to an existing i18n_json
         self.recurse = recurse
 
         # In recurse mode, we must ensure a recurse register
         if self.recurse:
-            # Must be either the name of an UltraDict as a string or an UltraDict instance
+            # Must be either the name of an i18n_json as a string or an i18n_json instance
             if recurse_register is not None:
                 if type(recurse_register) == str:
-                    self.recurse_register = UltraDict(name=recurse_register)
-                elif type(recurse_register) == UltraDict:
+                    self.recurse_register = i18n_json(name=recurse_register)
+                elif type(recurse_register) == i18n_json:
                     self.recurse_register = recurse_register
                 else:
                     raise Exception("Bad type for recurse_register")
 
             # If no register was defined, we should create one
             else:
-                self.recurse_register = UltraDict(name=f'{self.name}_register',
+                self.recurse_register = i18n_json(name=f'{self.name}_register',
                     recurse=False, auto_unlink=False, shared_lock=self.shared_lock)
                 # The register should not run its own finalizer if we need it later for unlinking our nested children
                 if self.auto_unlink:
@@ -834,11 +834,11 @@ class UltraDict(collections.UserDict, dict):
 
             if self.recurse:
 
-                assert type(self.recurse_register) == UltraDict, "recurse_register must be an UltraDict instance"
+                assert type(self.recurse_register) == i18n_json, "recurse_register must be an i18n_json instance"
 
                 if type(item) == dict:
                     # TODO: Use parent's buffer with a namespace prefix?
-                    item = UltraDict(item,
+                    item = i18n_json(item,
                                      recurse          = True,
                                      recurse_register = self.recurse_register,
                                      auto_unlink      = False,
@@ -952,7 +952,7 @@ class UltraDict(collections.UserDict, dict):
         return data
 
     def raise_already_closed(self, *args, **kwargs):
-        raise Exceptions.AlreadyClosed('UltraDict already closed, you can only access the `UltraDict.data` buffer!')
+        raise Exceptions.AlreadyClosed('i18n_json already closed, you can only access the `i18n_json.data` buffer!')
 
     def keys(self):
         self.apply_update()
@@ -1003,8 +1003,8 @@ class UltraDict(collections.UserDict, dict):
 
     def unlink_recursed(self):
         #log.debug("Unlink recursed id={}", hex(id(self)))
-        if not self.recurse or (type(self.recurse_register) != UltraDict):
-            raise Exception("Cannot unlink recursed for non-recurse UltraDict")
+        if not self.recurse or (type(self.recurse_register) != i18n_json):
+            raise Exception("Cannot unlink recursed for non-recurse i18n_json")
 
         ignore_errors = sys.platform == 'win32'
         for name in self.recurse_register.keys():
@@ -1022,7 +1022,7 @@ class UltraDict(collections.UserDict, dict):
         """
         try:
             #log.debug("Unlinking memory '{}'", name)
-            memory = UltraDict.get_memory(create=False, name=name)
+            memory = i18n_json.get_memory(create=False, name=name)
             memory.unlink()
             memory.close()
             return True
