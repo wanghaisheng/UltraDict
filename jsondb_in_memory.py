@@ -22,7 +22,6 @@ __all__ = ['jsondb_in_memory']
 
 import multiprocessing, multiprocessing.shared_memory, multiprocessing.synchronize
 import collections, os, pickle, sys, time, weakref
-import importlib.util, importlib.machinery
 
 try:
     # Needed for the shared locked
@@ -298,7 +297,7 @@ class jsondb_in_memory(collections.UserDict, dict):
             if hasattr(self, 'pid_remote_ctx'):
                 self.pid_remote_ctx.__exit__(None, None, None)
                 del self.pid_remote_ctx
-            if hasattr(self, 'pid_remote_aotmic'):
+            if hasattr(self, 'pid_remote_atomic'):
                 del self.pid_remote_atomic
             del self.lock_remote
             del self.pid_remote
@@ -439,7 +438,7 @@ class jsondb_in_memory(collections.UserDict, dict):
             if recurse is None:
                 recurse = recurse_remote
             elif recurse != recurse_remote:
-                raise Exceptions.ParameterMismatch(f"recure={recurse} was set but the creator has used recurse={recurse_remote}")
+                raise Exceptions.ParameterMismatch(f"recurse={recurse} was set but the creator has used recurse={recurse_remote}")
 
             # Got existing size of full dump memory, that must mean it's static size
             # and we should attach to it
@@ -834,9 +833,9 @@ class jsondb_in_memory(collections.UserDict, dict):
 
             if self.recurse:
 
-                assert type(self.recurse_register) == jsondb_in_memory, "recurse_register must be an jsondb_in_memory instance"
+                assert isinstance(self.recurse_register, jsondb_in_memory), "recurse_register must be an jsondb_in_memory instance"
 
-                if type(item) == dict:
+                if isinstance(item, dict):
                     # TODO: Use parent's buffer with a namespace prefix?
                     item = jsondb_in_memory(item,
                                      recurse          = True,
