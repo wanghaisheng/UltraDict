@@ -1,4 +1,21 @@
 #
+"""
+jsondb_in_memory
+
+A synchronized, streaming Python dictionary that uses shared memory as a backend. This
+module contains a jsondb_in_memory class that acts as a mutable mapping of objects stored
+in shared memory, providing fast access and modification of the shared data structure.
+The module handles synchronization, streaming of updates, and data persistence transparently.
+
+Classes:
+    jsondb_in_memory -- Main class implementing the shared, streaming dictionary.
+
+Dependencies:
+    multiprocessing, collections, os, pickle, sys, time, weakref, atomics (optional),
+    ultraimport (optional), logging (optional).
+
+"""
+
 # jsondb_in_memory
 #
 # A sychronized, streaming Python dictionary that uses shared memory as a backend
@@ -511,6 +528,13 @@ class jsondb_in_memory(collections.UserDict, dict):
 
 
     def init_remotes(self):
+        """
+        Initialize memoryviews for runtime state control in shared memory.
+
+        This method sets up memoryviews to various control segments within shared memory
+        to manage the runtime state of the update stream and other control variables used
+        by the jsondb_in_memory instance.
+        """
         # Memoryviews to the right buffer position in self.control
         self.update_stream_position_remote = self.control.buf[ 0:  4]
         self.lock_pid_remote               = self.control.buf[ 4:  8]
@@ -538,6 +562,29 @@ class jsondb_in_memory(collections.UserDict, dict):
 
     @staticmethod
     def get_memory(*, create=True, name=None, size=0):
+        """
+        Get or create a new shared memory object.
+
+        This function is used for attaching to an existing shared memory segment,
+        or creating a new one if it doesn't exist or if the 'create' parameter is True.
+
+        Parameters:
+            create (bool): Specifies whether to create the shared memory if it
+                doesn't exist. Defaults to True.
+            name (Optional[str]): The unique name for the shared memory object. If
+                None, a unique name will be generated (if 'create' is True).
+            size (int): The size in bytes for the shared memory segment if creating a new one.
+
+        Returns:
+            multiprocessing.shared_memory.SharedMemory: The shared memory object
+                associated with the name, or newly created.
+
+        Raises:
+            Exceptions.AlreadyExists: If 'create' is True and the shared memory with
+                the given name already exists.
+            Exceptions.CannotAttachSharedMemory: If no shared memory with the given
+                name exists and 'create' is False.
+        """
         """
         Attach an existing SharedMemory object with `name`.
 
@@ -571,6 +618,18 @@ class jsondb_in_memory(collections.UserDict, dict):
 
     #@profile
     def dump(self):
+        """
+        Serialize and store the entire dictionary contents into shared memory.
+
+        This method serializes the entire dictionary and writes it to a section of
+        shared memory, creating a full dump. This is used for synchronization
+        and recovery purposes, allowing other processes to efficiently load the
+        complete dictionary state.
+
+        Raises:
+            Exceptions.FullDumpMemoryFull: If the shared memory block allocated for the full
+                dump is not large enough to hold the serialized dictionary.
+        """
         """ Dump the full dict into shared memory """
 
         with self.lock:
